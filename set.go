@@ -38,14 +38,23 @@ func (s *Set) Difference(set *Set) *Set {
 func (s Set) Has(value any) bool {
 	switch v := value.(type) {
 	case *Set:
-		// check if its itself
+		// Check if its itself
 		if s.key == v.key {
 			return true
 		}
-		// check if its a direct descendent
-		if p, ok := v.parent[s.key]; ok && p.key == s.key {
+		// Check if its a direct descendent
+		p, ok := v.parent[s.key]
+		if ok && p.key == s.key {
 			return true
 		}
+		// Check chain - Depth First Search (Inverse)
+		// Maybe make this optional, or add a new search func
+		for _, p := range v.parent {
+			if p.Has(value) {
+				return true
+			}
+		}
+
 	default:
 		if _, ok := s.h[v]; ok {
 			return true

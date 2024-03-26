@@ -63,4 +63,25 @@ func Test(t *testing.T) {
 	if !s1.Has(s1) {
 		t.Errorf("set should be a subset of itself")
 	}
+
+	// Hierarchical
+	alice := New()
+	bob := New()
+	jane := New()
+	owners := New(alice)
+	writers := New(bob, owners)
+	readers := New(jane, writers)
+
+	if !owners.Has(alice) {
+		t.Errorf("alice should be an owner")
+	}
+	if !writers.Has(owners) {
+		t.Errorf("owners should be an writer")
+	}
+	if !readers.Has(writers) {
+		t.Errorf("writers should be an reader")
+	}
+	if !readers.Has(alice) {
+		t.Errorf("alice should be an reader")
+	}
 }
