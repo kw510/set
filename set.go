@@ -34,6 +34,38 @@ func (s *Set) Difference(set *Set) *Set {
 	return o
 }
 
+// Search for the element/set is in the set
+func (s Set) Check(value any) bool {
+	switch v := value.(type) {
+	case *Set:
+		if s.key == v.key {
+			return true
+		}
+		for _, p := range v.parent {
+			_, ok := p.parent[s.key]
+			if ok {
+				return ok
+			}
+			if s.Check(p) {
+				return true
+			}
+		}
+	default:
+		if _, ok := s.h[v]; ok {
+			return true
+		}
+		for _, c := range s.h {
+			if _, ok := c.h[v]; ok {
+				return true
+			}
+			if c.Check(v) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // Test to see whether or not the element/set is in the set
 func (s Set) Has(value any) bool {
 	switch v := value.(type) {
@@ -43,16 +75,9 @@ func (s Set) Has(value any) bool {
 			return true
 		}
 		// Check if its a direct descendent
-		p, ok := v.parent[s.key]
-		if ok && p.key == s.key {
+		_, ok := v.parent[s.key]
+		if ok {
 			return true
-		}
-		// Check chain - Depth First Search (Inverse)
-		// Maybe make this optional, or add a new search func
-		for _, p := range v.parent {
-			if p.Has(value) {
-				return true
-			}
 		}
 
 	default:
@@ -60,6 +85,7 @@ func (s Set) Has(value any) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

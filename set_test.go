@@ -68,20 +68,51 @@ func Test(t *testing.T) {
 	alice := New()
 	bob := New()
 	jane := New()
-	owners := New(alice)
-	writers := New(bob, owners)
-	readers := New(jane, writers)
 
-	if !owners.Has(alice) {
+	owners := New(alice)
+	writers := New(bob)
+	readers := New(jane)
+
+	writers.Insert(owners)
+	readers.Insert(writers)
+	writers.Insert("3")
+
+	if !owners.Check(alice) {
 		t.Errorf("alice should be an owner")
 	}
-	if !writers.Has(owners) {
-		t.Errorf("owners should be an writer")
+	if owners.Check(bob) {
+		t.Errorf("bob should not be an owner")
 	}
-	if !readers.Has(writers) {
-		t.Errorf("writers should be an reader")
+	if owners.Check(jane) {
+		t.Errorf("jane should not be an owner")
 	}
-	if !readers.Has(alice) {
+	if owners.Check("3") {
+		t.Errorf("3 should not be a owner")
+	}
+
+	if !writers.Check(alice) {
+		t.Errorf("alice should be an writer")
+	}
+	if !writers.Check(bob) {
+		t.Errorf("bob should be a writers")
+	}
+	if writers.Check(jane) {
+		t.Errorf("jane should not be a writer")
+	}
+	if !writers.Check("3") {
+		t.Errorf("3 should be a reader")
+	}
+
+	if !readers.Check(alice) {
 		t.Errorf("alice should be an reader")
+	}
+	if !readers.Check(bob) {
+		t.Errorf("bob should be a reader")
+	}
+	if !readers.Check(jane) {
+		t.Errorf("jane should be a reader")
+	}
+	if !readers.Check("3") {
+		t.Errorf("3 should be a reader")
 	}
 }
