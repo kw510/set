@@ -10,7 +10,7 @@ go get github.com/kw510/set
 ```
 Import it with:
 ```
-import "githug.com/kw510/set"
+import "github.com/kw510/set"
 ```
 
 ## Why?
