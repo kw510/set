@@ -1,23 +1,15 @@
 package set
 
-import (
-	"fmt"
-)
-
 type Set struct {
 	h      map[any]Set
-	parent map[string]*Set
-}
-
-func (s *Set) key() string {
-	return fmt.Sprintf("%p", s)
+	parent map[any]*Set
 }
 
 // Create a new set
 func New(values ...any) *Set {
 	s := &Set{
 		h:      map[any]Set{},
-		parent: map[string]*Set{},
+		parent: map[any]*Set{},
 	}
 
 	s.Insert(values...)
@@ -40,11 +32,11 @@ func (s *Set) Difference(set *Set) *Set {
 func (s *Set) Check(value any) bool {
 	switch v := value.(type) {
 	case *Set:
-		if s.key() == v.key() {
+		if s == v {
 			return true
 		}
 		for _, p := range v.parent {
-			_, ok := p.parent[s.key()]
+			_, ok := p.parent[s]
 			if ok {
 				return ok
 			}
@@ -73,11 +65,11 @@ func (s *Set) Has(value any) bool {
 	switch v := value.(type) {
 	case *Set:
 		// Check if its itself
-		if s.key() == v.key() {
+		if s == v {
 			return true
 		}
 		// Check if its a direct descendent
-		_, ok := v.parent[s.key()]
+		_, ok := v.parent[s]
 		if ok {
 			return true
 		}
@@ -96,7 +88,7 @@ func (s *Set) Insert(values ...any) {
 	for _, i := range values {
 		switch v := i.(type) {
 		case *Set:
-			v.parent[s.key()] = s
+			v.parent[s] = s
 			s.h[v] = *v
 		default:
 			s.h[v] = *New()
