@@ -73,7 +73,6 @@ func (s *Set) Has(value any) bool {
 	switch v := value.(type) {
 	case *Set:
 		// Check if its itself
-		fmt.Println(s.key(), v.key())
 		if s.key() == v.key() {
 			return true
 		}
