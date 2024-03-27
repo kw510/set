@@ -1,4 +1,4 @@
-# Set
+# Set [![Go Reference](https://pkg.go.dev/badge/github.com/kw510/set.svg)](https://pkg.go.dev/github.com/kw510/set)
 
 A go package to provide a set that knows its direct superset and direct members (sets or elements).
 
