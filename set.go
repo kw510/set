@@ -1,19 +1,21 @@
 package set
 
 import (
-	"github.com/rs/xid"
+	"fmt"
 )
 
 type Set struct {
-	key    string
 	h      map[any]Set
 	parent map[string]*Set
+}
+
+func (s *Set) Key() string {
+	return fmt.Sprintf("%p", s)
 }
 
 // Create a new set
 func New(values ...any) *Set {
 	s := &Set{
-		key:    xid.New().String(),
 		h:      map[any]Set{},
 		parent: map[string]*Set{},
 	}
@@ -35,14 +37,14 @@ func (s *Set) Difference(set *Set) *Set {
 }
 
 // Search for the element/set is in the set
-func (s Set) Check(value any) bool {
+func (s *Set) Check(value any) bool {
 	switch v := value.(type) {
 	case *Set:
-		if s.key == v.key {
+		if s.Key() == v.Key() {
 			return true
 		}
 		for _, p := range v.parent {
-			_, ok := p.parent[s.key]
+			_, ok := p.parent[s.Key()]
 			if ok {
 				return ok
 			}
@@ -67,15 +69,16 @@ func (s Set) Check(value any) bool {
 }
 
 // Test to see whether or not the element/set is in the set
-func (s Set) Has(value any) bool {
+func (s *Set) Has(value any) bool {
 	switch v := value.(type) {
 	case *Set:
 		// Check if its itself
-		if s.key == v.key {
+		fmt.Println(s.Key(), v.Key())
+		if s.Key() == v.Key() {
 			return true
 		}
 		// Check if its a direct descendent
-		_, ok := v.parent[s.key]
+		_, ok := v.parent[s.Key()]
 		if ok {
 			return true
 		}
@@ -90,11 +93,11 @@ func (s Set) Has(value any) bool {
 }
 
 // Add an element/set to the set
-func (s Set) Insert(values ...any) {
+func (s *Set) Insert(values ...any) {
 	for _, i := range values {
 		switch v := i.(type) {
 		case *Set:
-			v.parent[s.key] = &s
+			v.parent[s.Key()] = s
 			s.h[v] = *v
 		default:
 			s.h[v] = *New()
