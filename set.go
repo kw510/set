@@ -9,7 +9,7 @@ type Set struct {
 	parent map[string]*Set
 }
 
-func (s *Set) Key() string {
+func (s *Set) key() string {
 	return fmt.Sprintf("%p", s)
 }
 
@@ -40,11 +40,11 @@ func (s *Set) Difference(set *Set) *Set {
 func (s *Set) Check(value any) bool {
 	switch v := value.(type) {
 	case *Set:
-		if s.Key() == v.Key() {
+		if s.key() == v.key() {
 			return true
 		}
 		for _, p := range v.parent {
-			_, ok := p.parent[s.Key()]
+			_, ok := p.parent[s.key()]
 			if ok {
 				return ok
 			}
@@ -73,12 +73,12 @@ func (s *Set) Has(value any) bool {
 	switch v := value.(type) {
 	case *Set:
 		// Check if its itself
-		fmt.Println(s.Key(), v.Key())
-		if s.Key() == v.Key() {
+		fmt.Println(s.key(), v.key())
+		if s.key() == v.key() {
 			return true
 		}
 		// Check if its a direct descendent
-		_, ok := v.parent[s.Key()]
+		_, ok := v.parent[s.key()]
 		if ok {
 			return true
 		}
@@ -97,7 +97,7 @@ func (s *Set) Insert(values ...any) {
 	for _, i := range values {
 		switch v := i.(type) {
 		case *Set:
-			v.parent[s.Key()] = s
+			v.parent[s.key()] = s
 			s.h[v] = *v
 		default:
 			s.h[v] = *New()
