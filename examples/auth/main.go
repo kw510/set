@@ -11,11 +11,6 @@ type Permission struct {
 	Roles    map[string]*set.Set
 }
 
-type Resource struct {
-	Id   string
-	Data map[string]any
-}
-
 type User struct {
 	Id    string
 	Email string
