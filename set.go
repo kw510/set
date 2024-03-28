@@ -1,14 +1,14 @@
 package set
 
 type Set struct {
-	h      map[any]Set
+	h      map[any]any
 	parent map[any]*Set
 }
 
 // Create a new set
 func New(values ...any) *Set {
 	s := &Set{
-		h:      map[any]Set{},
+		h:      map[any]any{},
 		parent: map[any]*Set{},
 	}
 
@@ -32,6 +32,7 @@ func (s *Set) Difference(set *Set) *Set {
 func (s *Set) Check(value any) bool {
 	switch v := value.(type) {
 	case *Set:
+		// Check if its itself
 		if s == v {
 			return true
 		}
@@ -48,12 +49,15 @@ func (s *Set) Check(value any) bool {
 		if _, ok := s.h[v]; ok {
 			return true
 		}
-		for _, c := range s.h {
-			if _, ok := c.h[v]; ok {
-				return true
-			}
-			if c.Check(v) {
-				return true
+
+		for _, a := range s.h {
+			if c, ok := a.(*Set); ok {
+				if _, ok := c.h[v]; ok {
+					return true
+				}
+				if c.Check(v) {
+					return true
+				}
 			}
 		}
 	}
@@ -83,15 +87,18 @@ func (s *Set) Has(value any) bool {
 	return false
 }
 
-// Add an element/set to the set
+// Add an element/set to the set.
 func (s *Set) Insert(values ...any) {
 	for _, i := range values {
 		switch v := i.(type) {
 		case *Set:
+			if s.Check(v) { // force acyclic graph / uniqueness
+				continue
+			}
 			v.parent[s] = s
-			s.h[v] = *v
+			s.h[v] = v
 		default:
-			s.h[v] = *New()
+			s.h[v] = v
 		}
 	}
 }
@@ -126,5 +133,20 @@ func (s *Set) Union(set *Set) *Set {
 	for k := range set.h {
 		o.Insert(k)
 	}
+	return o
+}
+
+// Flattens the set, including subsets. Full graph traversal.
+func (s *Set) Flatten() []any {
+	o := []any{}
+	for k := range s.h {
+		switch v := k.(type) {
+		case *Set:
+			o = append(o, v.Flatten()...)
+		default:
+			o = append(o, k)
+		}
+	}
+
 	return o
 }
