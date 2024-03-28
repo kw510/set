@@ -5,6 +5,8 @@ type Set struct {
 	parent map[any]*Set
 }
 
+type empty struct{}
+
 // Create a new set
 func New(values ...any) *Set {
 	s := &Set{
@@ -98,7 +100,7 @@ func (s *Set) Insert(values ...any) {
 			v.parent[s] = s
 			s.h[v] = v
 		default:
-			s.h[v] = v
+			s.h[v] = empty{}
 		}
 	}
 }
